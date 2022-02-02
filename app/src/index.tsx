@@ -1,6 +1,7 @@
 import { gql } from 'graphql-request'
 import ReactDOM from 'react-dom'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import Layout from './components/Layout'
 import ProfilePage from './components/ProfilePage'
 import './index.css'
 import EditProfileForm from './routes/editProfiles'
@@ -31,12 +32,14 @@ if (mountingPoint == null) {
 
 function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<ProfilePage />} />
-        <Route path="profileEdit" element={<EditProfileForm />} />
-      </Routes>
-    </BrowserRouter>
+    <Layout>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/profile" element={<ProfilePage />} />
+          <Route path="profileEdit" element={<EditProfileForm />} />
+        </Routes>
+      </BrowserRouter>
+    </Layout>
   )
 }
 
