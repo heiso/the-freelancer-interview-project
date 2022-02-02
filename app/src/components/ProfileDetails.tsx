@@ -1,5 +1,6 @@
 import { gql, request } from 'graphql-request'
 import { useQuery } from 'react-query'
+import { Link } from 'react-router-dom'
 import { Profile } from '../generated/graphql'
 
 export const endpoint = '/api/graphql'
@@ -93,6 +94,12 @@ function ProfileDetails() {
           </div>
         </dl>
       </div>
+      <button
+        type="button"
+        className="flex mx-auto px-4 py-2 border border-gray-300 shadow-sm text-sm lg:text-base font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+      >
+        <Link to="/profileEdit">Modifier</Link>
+      </button>
     </div>
   )
 }

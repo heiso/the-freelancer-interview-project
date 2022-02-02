@@ -1,7 +1,9 @@
 import { gql } from 'graphql-request'
 import ReactDOM from 'react-dom'
+import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import ProfilePage from './components/ProfilePage'
 import './index.css'
+import EditProfileForm from './routes/editProfiles'
 
 /**
  * The type `AvatarExampleFragment` in automatically generated.
@@ -28,7 +30,14 @@ if (mountingPoint == null) {
 }
 
 function App() {
-  return <ProfilePage />
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<ProfilePage />} />
+        <Route path="profileEdit" element={<EditProfileForm />} />
+      </Routes>
+    </BrowserRouter>
+  )
 }
 
-ReactDOM.render(<ProfilePage />, mountingPoint)
+ReactDOM.render(<App />, mountingPoint)
