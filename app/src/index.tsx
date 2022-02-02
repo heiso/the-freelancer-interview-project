@@ -1,10 +1,13 @@
 import { gql } from 'graphql-request'
 import ReactDOM from 'react-dom'
+import { QueryClient, QueryClientProvider } from 'react-query'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import Layout from './components/Layout'
 import ProfilePage from './components/ProfilePage'
 import './index.css'
-import EditProfileForm from './routes/editProfiles'
+import EditProfileForm from './routes/editProfile'
+
+const queryClient = new QueryClient()
 
 /**
  * The type `AvatarExampleFragment` in automatically generated.
@@ -33,12 +36,14 @@ if (mountingPoint == null) {
 function App() {
   return (
     <Layout>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/profile" element={<ProfilePage />} />
-          <Route path="profileEdit" element={<EditProfileForm />} />
-        </Routes>
-      </BrowserRouter>
+      <QueryClientProvider client={queryClient}>
+        <BrowserRouter>
+          <Routes>
+            <Route path="/profile" element={<ProfilePage />} />
+            <Route path="profileEdit" element={<EditProfileForm />} />
+          </Routes>
+        </BrowserRouter>
+      </QueryClientProvider>
     </Layout>
   )
 }
