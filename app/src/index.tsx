@@ -1,29 +1,11 @@
-import { gql } from 'graphql-request'
 import ReactDOM from 'react-dom'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import Layout from './components/Layout'
-import ProfilePage from './components/ProfilePage'
 import './index.css'
-import EditProfileForm from './routes/editProfile'
-
-const queryClient = new QueryClient()
-
-/**
- * The type `AvatarExampleFragment` in automatically generated.
- * The document can be passed to any graphql client.
- *
- * @example
- * import { AvatarExampleFragment } from './generated/graphql'
- */
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const AvatarExampleFragmentDocument = gql`
-  fragment AvatarExample on Avatar {
-    smallUrl
-    largeUrl
-    xLargeUrl
-  }
-`
+import Home from './routes/home'
+import ProfilePage from './routes/profile'
+import EditProfilePage from './routes/profile/edit'
 
 const mountingPoint = document.getElementById('root')
 
@@ -33,18 +15,21 @@ if (mountingPoint == null) {
   )
 }
 
+const queryClient = new QueryClient()
+
 function App() {
   return (
-    <Layout>
+    <BrowserRouter>
       <QueryClientProvider client={queryClient}>
-        <BrowserRouter>
+        <Layout>
           <Routes>
+            <Route path="/" element={<Home />} />
             <Route path="/profile" element={<ProfilePage />} />
-            <Route path="profileEdit" element={<EditProfileForm />} />
+            <Route path="/profile/edit" element={<EditProfilePage />} />
           </Routes>
-        </BrowserRouter>
+        </Layout>
       </QueryClientProvider>
-    </Layout>
+    </BrowserRouter>
   )
 }
 
