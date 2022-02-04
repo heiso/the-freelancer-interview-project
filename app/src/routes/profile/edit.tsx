@@ -23,12 +23,7 @@ function EditProfileForm() {
   const [formSuccess, setFormSuccess] = useState<null | string>(null)
   const dobValue = data?.birthDate
   const birthDate = dobValue?.slice(0, 10)
-  const {
-    register,
-    handleSubmit,
-    getValues,
-    formState: { errors },
-  } = useForm<FormInputs>()
+  const { register, handleSubmit, getValues } = useForm<FormInputs>()
 
   const changeValueToBoolean = (value) => {
     if (value === 'oui') return true
@@ -91,6 +86,7 @@ function EditProfileForm() {
                   <div className="flex items-center">
                     <img
                       src={`../..${data.avatar?.smallUrl}`}
+                      alt={`${data.firstname} ${data.lastname} avatar`}
                       className="h-12 w-12 rounded-full overflow-hidden bg-gray-100"
                     ></img>
                     <button
