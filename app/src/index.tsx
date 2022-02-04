@@ -1,6 +1,6 @@
-import gql from 'graphql-tag'
+import { gql } from 'graphql-request'
 import ReactDOM from 'react-dom'
-import Hello from './components/hello'
+import ProfilePage from './components/ProfilePage'
 import './index.css'
 
 /**
@@ -27,8 +27,8 @@ if (mountingPoint == null) {
   )
 }
 
-const FreelancerPage = () => {
-  return <Hello />
+function App() {
+  return <ProfilePage />
 }
 
-ReactDOM.render(<FreelancerPage />, mountingPoint)
+ReactDOM.render(<ProfilePage />, mountingPoint)
