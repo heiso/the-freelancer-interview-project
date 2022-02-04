@@ -1,5 +1,5 @@
 import { gql } from 'graphql-tag'
-import { Resolvers } from '../generated/graphql'
+import { Language, Resolvers } from '../generated/graphql'
 import { MOCK_FREELANCER } from './db'
 
 export const typeDefs = gql`
@@ -21,9 +21,18 @@ export const typeDefs = gql`
     firstname: String!
     lastname: String!
     isVisible: Boolean
-    retribution: Int
+    retribution: Int!
     birthDate: String
     avatar: Avatar
+    language: Language
+  }
+
+  input ProfileInput {
+    firstname: String!
+    lastname: String!
+    isVisible: Boolean
+    retribution: String
+    birthDate: String
     language: Language
   }
 
@@ -32,10 +41,10 @@ export const typeDefs = gql`
     myProfile: Profile!
   }
 
-  # Todo: Write a mutation to update the current freelancer's profile.
-  # type Mutation {
-  #   ...
-  # }
+  # Mutation to update the current freelancer's profile.
+  type Mutation {
+    updateProfile(input: ProfileInput!): Profile!
+  }
 `
 
 function formatAvatar(avatar?: typeof MOCK_FREELANCER.avatar) {
@@ -50,8 +59,7 @@ function formatAvatar(avatar?: typeof MOCK_FREELANCER.avatar) {
 export const resolvers: Resolvers = {
   Query: {
     /**
-     * @Todo
-     * Implement the query to retrieve the current freelancer's profile.
+     * Query to retrieve the current freelancer's profile.
      */
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     myProfile(root, args, context) {
@@ -64,8 +72,21 @@ export const resolvers: Resolvers = {
   },
 
   /**
-   * @Todo
-   * Implement the mutation to update the current freelancer's profile.
+   * Mutation to update the current freelancer's profile.
    */
-  // Mutation: {},
+  Mutation: {
+    updateProfile(root, { input }) {
+      MOCK_FREELANCER.firstname = input.firstname
+      MOCK_FREELANCER.lastname = input.lastname
+      MOCK_FREELANCER.birthDate = input.birthDate || ''
+      MOCK_FREELANCER.retribution = parseInt(input.retribution || '0')
+      MOCK_FREELANCER.language = input.language || Language.KLINGON
+      MOCK_FREELANCER.isVisible = input.isVisible || false
+      const avatar = formatAvatar(MOCK_FREELANCER.avatar)
+      return {
+        ...MOCK_FREELANCER,
+        avatar,
+      }
+    },
+  },
 }

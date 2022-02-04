@@ -13,7 +13,7 @@ export const MOCK_FREELANCER = {
   },
   firstname: 'Gordon',
   lastname: 'Champlin',
-  language: Language.KLINGON,
+  language: Language.KLINGON as Language,
   birthDate: new Date(1990, 12, 31).toISOString(),
   isVisible: false,
   retribution: 500,
