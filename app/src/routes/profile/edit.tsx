@@ -1,65 +1,70 @@
-import { gql, request } from 'graphql-request'
+import { useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
-import { useQuery } from 'react-query'
 import { Link } from 'react-router-dom'
-import { Language, Profile } from '../generated/graphql'
+import { FullButton } from '../../components/Buttons'
+import { Loader } from '../../components/Loader'
+import { Language } from '../../generated/graphql'
+import useProfile from '../../hooks/useProfile'
+import useUpdateProfile from '../../hooks/useUpdateProfile'
 
-export const endpoint = '/api/graphql'
-
-function useProfile() {
-  return useQuery<Profile, Error>('myProfile', async () => {
-    const { myProfile } = await request(
-      endpoint,
-      gql`
-        query {
-          myProfile {
-            id
-            firstname
-            lastname
-            avatar {
-              smallUrl
-              largeUrl
-              xLargeUrl
-            }
-            language
-            birthDate
-            retribution
-            isVisible
-          }
-        }
-      `
-    )
-    return myProfile
-  })
-}
-
-type Inputs = {
+type FormInputs = {
   firstname: string
   lastname: string
-  dob: string
+  birthDate: string
   retribution: number
   language: Language
-  availability: boolean
+  isVisible: boolean
 }
 
 function EditProfileForm() {
   const { status, data, error } = useProfile()
+  const { mutate } = useUpdateProfile()
+  const [formError, setFormError] = useState<null | string>(null)
+  const [formSuccess, setFormSuccess] = useState<null | string>(null)
   const dobValue = data?.birthDate
-  console.log(dobValue?.slice(0, 10))
-  const dob = dobValue?.slice(0, 10)
+  const birthDate = dobValue?.slice(0, 10)
   const {
     register,
     handleSubmit,
-    watch,
+    getValues,
     formState: { errors },
-  } = useForm<Inputs>()
-  const onSubmit: SubmitHandler<Inputs> = (data) => console.log(data)
-  console.log(watch('firstname'))
-  console.log(watch('lastname'))
-  console.log(watch('dob'))
-  console.log(watch('language'))
-  console.log(watch('availability'))
-  console.log(watch('retribution'))
+  } = useForm<FormInputs>()
+
+  const changeValueToBoolean = (value) => {
+    if (value === 'oui') return true
+    return false
+  }
+
+  const changeBooleanToValue = (bool) => {
+    if (bool === true) return 'oui'
+    return 'non'
+  }
+
+  const onSubmit: SubmitHandler<FormInputs> = async (data) => {
+    const formValues = {
+      firstname: getValues('firstname'),
+      lastname: getValues('lastname'),
+      birthDate: getValues('birthDate'),
+      retribution: getValues('retribution').toString(),
+      language: getValues('language'),
+      isVisible: changeValueToBoolean(getValues('isVisible')),
+    }
+
+    await mutate(formValues, {
+      onError: () => {
+        setFormError('an error occured while saving you profile')
+      },
+      onSuccess: () => {
+        setFormSuccess('Votre profil a été modifié avec succès')
+      },
+    })
+  }
+  if (status === 'loading') {
+    return <Loader />
+  }
+  if (status === 'error') {
+    return <div>Error: {error?.message}</div>
+  }
   if (!data) {
     return <div>Error : data is missing</div>
   }
@@ -77,6 +82,7 @@ function EditProfileForm() {
               </p>
             </div>
             <div className="space-y-6 sm:space-y-5">
+              {/* NOTE: Change avatar picture not available */}
               <div className="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-center sm:border-t sm:border-gray-200 sm:pt-5">
                 <label htmlFor="photo" className="block text-sm font-medium text-gray-700">
                   Photo
@@ -89,6 +95,7 @@ function EditProfileForm() {
                     ></img>
                     <button
                       type="button"
+                      disabled
                       className="ml-5 bg-white py-2 px-3 border border-gray-300 rounded-md shadow-sm text-sm leading-4 font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
                     >
                       Change
@@ -106,7 +113,7 @@ function EditProfileForm() {
                 </label>
                 <div className="mt-1 sm:mt-0 sm:col-span-2">
                   <input
-                    defaultValue={data?.firstname}
+                    defaultValue={data.firstname}
                     {...register('firstname')}
                     type="text"
                     name="firstname"
@@ -126,7 +133,7 @@ function EditProfileForm() {
                 </label>
                 <div className="mt-1 sm:mt-0 sm:col-span-2">
                   <input
-                    defaultValue={data?.lastname}
+                    defaultValue={data.lastname}
                     {...register('lastname')}
                     type="text"
                     name="lastname"
@@ -139,18 +146,18 @@ function EditProfileForm() {
 
               <div className="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-gray-200 sm:pt-5">
                 <label
-                  htmlFor="dob"
+                  htmlFor="birthDate"
                   className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
                 >
                   Date of birth
                 </label>
                 <div className="mt-1 sm:mt-0 sm:col-span-2">
                   <input
-                    defaultValue={dob}
-                    {...register('dob')}
+                    defaultValue={birthDate}
+                    {...register('birthDate')}
                     type="date"
-                    id="dob"
-                    name="dob"
+                    id="birthDate"
+                    name="birthDate"
                     autoComplete="bday"
                     className="max-w-lg block w-full shadow-sm focus:ring-gray-500 focus:border-gray-500 sm:max-w-xs sm:text-sm border-gray-300 rounded-md"
                   />
@@ -166,15 +173,16 @@ function EditProfileForm() {
                 </label>
                 <div className="mt-1 sm:mt-0 sm:col-span-2">
                   <select
+                    defaultValue={data.language || Language.FRENCH}
                     {...register('language')}
                     id="language"
                     name="language"
                     autoComplete="language"
                     className="max-w-lg block focus:ring-gray-500 focus:border-gray-500 w-full shadow-sm sm:max-w-xs sm:text-sm border-gray-300 rounded-md"
                   >
-                    <option value="ENGLISH">Anglais</option>
-                    <option value="FRENCH">Français</option>
-                    <option value="KLINGON">Klingon</option>
+                    <option value={Language.ENGLISH}>Anglais</option>
+                    <option value={Language.FRENCH}>Français</option>
+                    <option value={Language.KLINGON}>Klingon</option>
                   </select>
                 </div>
               </div>
@@ -200,17 +208,17 @@ function EditProfileForm() {
 
               <div className="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-gray-200 sm:pt-5">
                 <label
-                  htmlFor="language"
+                  htmlFor="isVisible"
                   className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
                 >
                   Disponibilité
                 </label>
                 <div className="mt-1 sm:mt-0 sm:col-span-2">
                   <select
-                    {...register('availability')}
-                    id="availability"
-                    name="availability"
-                    autoComplete="availability-name"
+                    defaultValue={changeBooleanToValue(data.isVisible)}
+                    {...register('isVisible')}
+                    id="isVisible"
+                    name="isVisible"
                     className="max-w-lg block focus:ring-gray-500 focus:border-gray-500 w-full shadow-sm sm:max-w-xs sm:text-sm border-gray-300 rounded-md"
                   >
                     <option value="oui">Oui</option>
@@ -221,20 +229,18 @@ function EditProfileForm() {
             </div>
           </div>
         </div>
-
         <div className="pt-5 flex justify-center">
           <div className="flex justify-end">
             <Link className="font-medium underline self-center" to="/profile">
-              Annuler
+              Retourner à mon profil
             </Link>
-            <button
-              type="submit"
-              className="ml-3 inline-flex justify-center py-2 px-4 shadow-sm text-sm font-medium rounded-md text-white bg-gray-500 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
-            >
-              Sauvegarder
-            </button>
+            <FullButton type="submit">Sauvegarder</FullButton>
           </div>
         </div>
+        {formError && <div className="text-red-500 text-center border-none">{formError}</div>}
+        {formSuccess && (
+          <div className="text-emerald-400 text-center border-none">{formSuccess}</div>
+        )}
       </form>
     </div>
   )
