@@ -1,5 +1,7 @@
 import gql from 'graphql-tag'
 import ReactDOM from 'react-dom'
+import Hello from './components/hello'
+import './index.css'
 
 /**
  * The type `AvatarExampleFragment` in automatically generated.
@@ -25,4 +27,8 @@ if (mountingPoint == null) {
   )
 }
 
-ReactDOM.render(<>{/** @Todo */}</>, mountingPoint)
+const FreelancerPage = () => {
+  return <Hello />
+}
+
+ReactDOM.render(<FreelancerPage />, mountingPoint)
