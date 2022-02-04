@@ -1,21 +1,11 @@
-import gql from 'graphql-tag'
 import ReactDOM from 'react-dom'
-
-/**
- * The type `AvatarExampleFragment` in automatically generated.
- * The document can be passed to any graphql client.
- *
- * @example
- * import { AvatarExampleFragment } from './generated/graphql'
- */
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const AvatarExampleFragmentDocument = gql`
-  fragment AvatarExample on Avatar {
-    smallUrl
-    largeUrl
-    xLargeUrl
-  }
-`
+import { QueryClient, QueryClientProvider } from 'react-query'
+import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import Layout from './components/Layout'
+import './index.css'
+import Home from './routes/home'
+import ProfilePage from './routes/profile'
+import EditProfilePage from './routes/profile/edit'
 
 const mountingPoint = document.getElementById('root')
 
@@ -25,4 +15,22 @@ if (mountingPoint == null) {
   )
 }
 
-ReactDOM.render(<>{/** @Todo */}</>, mountingPoint)
+const queryClient = new QueryClient()
+
+function App() {
+  return (
+    <BrowserRouter>
+      <QueryClientProvider client={queryClient}>
+        <Layout>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/profile/edit" element={<EditProfilePage />} />
+          </Routes>
+        </Layout>
+      </QueryClientProvider>
+    </BrowserRouter>
+  )
+}
+
+ReactDOM.render(<App />, mountingPoint)

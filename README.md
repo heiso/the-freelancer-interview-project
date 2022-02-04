@@ -19,7 +19,21 @@ Have a look in the code to see the missing pieces.
 
 ## Getting started
 
-Fork the repository and in root folder, run the commands:
+Fork the repository and go into the root folder
+
+Make sure you have the correct version of `node` installed, example using nvm:
+
+```sh
+nvm i
+```
+
+and use it:
+
+```sh
+nvm use
+```
+
+Install the dependencies and start the project
 
 ```sh
 npm i
@@ -27,6 +41,8 @@ npm run up
 ```
 
 `npm run up` will start up several background process with [pm2](https://pm2.io/) that are required for development.
+
+The app will be running in your browser [http://localhost:3000](http://localhost:3000).
 
 If you want to know if everything is running like it should, `npm run list` will list all processes and `npm run log [process-name]` will display to the console the output of a process.
 
